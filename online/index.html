@@ -53,7 +53,7 @@ h1{text-align:center;margin-bottom:30px;font-size:2.5em;text-shadow:0 0 20px rgb
 <div id="lobby">
   <div class="input-group">
     <label>你的昵称</label>
-    <input type="text" id="playerName" placeholder="输入昵称" value="玩家">
+    <input type="text" id="pName" placeholder="输入昵称" value="玩家">
   </div>
   <div class="input-group">
     <label>服务器地址（默认本机）</label>
@@ -65,14 +65,14 @@ h1{text-align:center;margin-bottom:30px;font-size:2.5em;text-shadow:0 0 20px rgb
   </div>
   <div class="input-group" style="display:none;margin-top:10px" id="joinCode">
     <label>输入房间码</label>
-    <input type="text" placeholder="例如 ABCD" style="text-transform:uppercase;letter-spacing:4px;font-size:1.2em;text-align:center;" onkeydown="if(event.key==='Enter')joinRoom()">
+    <input type="text" id="jCode" placeholder="例如 ABCD" style="text-transform:uppercase;letter-spacing:4px;font-size:1.2em;text-align:center;" onkeydown="if(event.key==='Enter')joinRoom()">
   </div>
 
   <div id="roomInfo">
     <p>房间码</p>
     <div class="room-code" id="roomCode">----</div>
     <ul class="player-list" id="playerList"></ul>
-    <button class="btn btn-warning" id="startGameBtn" onclick="startGame()" style="display:none">🎯 开始游戏</button>
+    <button class="btn btn-warning" id="startBtn" onclick="startGame()" style="display:none">🎯 开始游戏</button>
   </div>
 </div>
 
@@ -80,12 +80,15 @@ h1{text-align:center;margin-bottom:30px;font-size:2.5em;text-shadow:0 0 20px rgb
 <div id="gameArea">
   <div class="game-header">
     <div class="turn-indicator" id="turnIndicator">等待开始...</div>
-    <div id="onlinePlayers" class="player-info"></div>
+    <div id="playerPanel" class="player-info"></div>
   </div>
   <div class="board-wrapper">
     <div id="gameBoard"></div>
   </div>
   <div id="log">📋 游戏日志</div>
+  <div style="margin-top:10px;text-align:center;color:#666;font-size:0.85em">
+    房间码: <span id="roomCodeDisplay"></span>
+  </div>
 </div>
 </div>
 
