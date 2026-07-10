@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🕉 在线飞行棋</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Microsoft YaHei',sans-serif;background:linear-gradient(135deg,#1a1a2e,#16213e);min-height:100vh;color:#fff;display:flex;justify-content:center;align-items:center;padding:20px;}
+.container{max-width:1100px;width:100%;}
+h1{text-align:center;margin-bottom:30px;font-size:2.5em;text-shadow:0 0 20px rgba(255,215,0,0.3);}
+
+/* 大厅 */
+#lobby{background:rgba(255,255,255,0.08);border-radius:20px;padding:40px;max-width:500px;margin:0 auto;backdrop-filter:blur(10px);}
+.input-group{margin-bottom:15px;}
+.input-group label{display:block;margin-bottom:5px;font-size:0.9em;color:#aaa;}
+.input-group input{width:100%;padding:12px 15px;border:2px solid rgba(255,255,255,0.2);border-radius:10px;background:rgba(255,255,255,0.1);color:#fff;font-size:1em;outline:none;transition:border-color 0.3s;}
+.input-group input:focus{border-color:#ffd700;}
+.btn-row{display:flex;gap:15px;margin-top:20px;}
+.btn{padding:12px 30px;border:none;border-radius:10px;font-size:1.1em;font-weight:bold;cursor:pointer;transition:all 0.3s;flex:1;}
+.btn-primary{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 5px 20px rgba(102,126,234,0.4);}
+.btn-success{background:linear-gradient(135deg,#4caf50,#2e7d32);color:#fff;}
+.btn-success:hover{transform:translateY(-2px);}
+.btn-warning{background:linear-gradient(135deg,#ff9800,#e65100);color:#fff;}
+
+/* 房间信息 */
+#roomInfo{display:none;text-align:center;margin-top:20px;}
+.room-code{font-size:3em;font-weight:bold;color:#ffd700;letter-spacing:8px;margin:10px 0;text-shadow:0 0 15px rgba(255,215,0,0.3);}
+.player-list{list-style:none;margin:15px 0;}
+.player-list li{padding:10px 15px;margin:5px 0;background:rgba(255,255,255,0.1);border-radius:8px;text-align:left;}
+
+/* 游戏区 */
+#gameArea{display:none;flex-direction:column;align-items:center;}
+#gameArea.show{display:flex;}
+.game-header{display:flex;justify-content:space-between;align-items:center;width:100%;margin-bottom:15px;flex-wrap:wrap;gap:10px;}
+.player-info{display:flex;gap:10px;flex-wrap:wrap;}
+.online-player{padding:8px 15px;border-radius:8px;background:rgba(255,255,255,0.1);border-left:4px solid #999;}
+.online-player.active{background:rgba(255,215,0,0.2);}
+.turn-indicator{font-size:1.3em;font-weight:bold;color:#ffd700;}
+.board-wrapper{position:relative;margin:0 auto;}
+#gameBoard{width:1040px;height:1040px;position:relative;}
+#log{width:100%;height:100px;overflow-y:auto;background:rgba(0,0,0,0.3);border-radius:10px;padding:10px;margin-top:10px;font-size:0.85em;color:#aaa;}
+
+@media(max-width:1100px){#gameBoard{width:100%;height:auto;min-height:600px;}}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>🕉 在线飞行棋</h1>
+
+<!-- 大厅 -->
+<div id="lobby">
+  <div class="input-group">
+    <label>你的昵称</label>
+    <input type="text" id="playerName" placeholder="输入昵称" value="玩家">
+  </div>
+  <div class="input-group">
+    <label>服务器地址（默认本机）</label>
+    <input type="text" id="serverUrl" placeholder="http://localhost:3000" value="">
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-primary" id="createBtn" onclick="createRoom()">🏠 创建房间</button>
+    <button class="btn btn-success" id="joinBtn" onclick="document.getElementById('joinCode').style.display='block'">🔑 加入房间</button>
+  </div>
+  <div class="input-group" style="display:none;margin-top:10px" id="joinCode">
+    <label>输入房间码</label>
+    <input type="text" placeholder="例如 ABCD" style="text-transform:uppercase;letter-spacing:4px;font-size:1.2em;text-align:center;" onkeydown="if(event.key==='Enter')joinRoom()">
+  </div>
+
+  <div id="roomInfo">
+    <p>房间码</p>
+    <div class="room-code" id="roomCode">----</div>
+    <ul class="player-list" id="playerList"></ul>
+    <button class="btn btn-warning" id="startGameBtn" onclick="startGame()" style="display:none">🎯 开始游戏</button>
+  </div>
+</div>
+
+<!-- 游戏区 -->
+<div id="gameArea">
+  <div class="game-header">
+    <div class="turn-indicator" id="turnIndicator">等待开始...</div>
+    <div id="onlinePlayers" class="player-info"></div>
+  </div>
+  <div class="board-wrapper">
+    <div id="gameBoard"></div>
+  </div>
+  <div id="log">📋 游戏日志</div>
+</div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="game.js"></script>
+</body>
+</html>

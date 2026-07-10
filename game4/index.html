@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>飞行棋</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>飞行棋 · 四人对战</h1>
+
+        <!-- 玩家信息面板 -->
+        <div class="players-panel">
+            <div class="player player1"><div class="player-name">🔴 P1</div><div class="player-status">在基地</div></div>
+            <div class="player player2"><div class="player-name">🔵 P2</div><div class="player-status">在基地</div></div>
+            <div class="player player3"><div class="player-name">🟢 P3</div><div class="player-status">在基地</div></div>
+            <div class="player player4"><div class="player-name">🟡 P4</div><div class="player-status">在基地</div></div>
+        </div>
+
+        <!-- 棋盘 -->
+        <div class="board-container">
+            <div class="board" id="board">
+                <!-- 棋盘格子将由JavaScript生成 -->
+            </div>
+        </div>
+
+        <!-- 控制面板 -->
+        <div class="controls">
+            <button class="roll-btn" id="rollBtn">掷骰子</button>
+            <div class="game-info">
+                <p id="gameMessage">点击"掷骰子"开始游戏</p>
+            </div>
+            <div class="board-background-control">
+                <label>棋盘背景图片:</label>
+                <input type="file" id="boardImage" accept="image/*" style="padding: 5px;">
+            </div>
+            <div class="piece-customization">
+                <label>🔴P1:</label><select id="pieceIcon1" style="padding:3px;font-size:0.9em;"><option value="👠">👠</option><option value="🚗">🚗</option><option value="🚀">🚀</option><option value="🌟">🌟</option><option value="image1">🖼️</option></select><input type="file" id="pieceImage1" accept="image/*" style="display:none;padding:3px;">
+                <label>🔵P2:</label><select id="pieceIcon2" style="padding:3px;font-size:0.9em;"><option value="🚗">🚗</option><option value="👠">👠</option><option value="🚀">🚀</option><option value="🌟">🌟</option><option value="image2">🖼️</option></select><input type="file" id="pieceImage2" accept="image/*" style="display:none;padding:3px;">
+                <label>🟢P3:</label><select id="pieceIcon3" style="padding:3px;font-size:0.9em;"><option value="🐱">🐱</option><option value="🐶">🐶</option><option value="🐰">🐰</option><option value="🦊">🦊</option><option value="image3">🖼️</option></select><input type="file" id="pieceImage3" accept="image/*" style="display:none;padding:3px;">
+                <label>🟡P4:</label><select id="pieceIcon4" style="padding:3px;font-size:0.9em;"><option value="🎯">🎯</option><option value="⚽">⚽</option><option value="🍀">🍀</option><option value="💎">💎</option><option value="image4">🖼️</option></select><input type="file" id="pieceImage4" accept="image/*" style="display:none;padding:3px;">
+            </div>
+            <button class="restart-btn" id="restartBtn">重新开始</button>
+            <button class="clear-btn" id="clearBtn">清除所有设置</button>
+        </div>
+
+        <!-- 弹窗 -->
+        <div class="popup-overlay" id="popupOverlay">
+            <div class="popup-content">
+                <p id="popupText"></p>
+                <button id="closePopup">关闭</button>
+            </div>
+        </div>
+
+        <!-- 格子编辑面板 -->
+        <div class="cell-editor" id="cellEditor">
+            <h3>格子设置</h3>
+            <div class="editor-content">
+                <label>格子编号: <span id="cellNumber"></span></label>
+
+                <div class="custom-text-section">
+                    <label>格子上的文字:</label>
+                    <input type="text" id="customText" placeholder="输入显示在格子上的文字" maxlength="10" style="width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ddd; border-radius: 3px;">
+                </div>
+
+                <div class="popup-text-section">
+                    <label>弹窗文字 (走到时显示):</label>
+                    <textarea id="cellPopupText" placeholder="输入走到这个格子时弹窗显示的文字" maxlength="100" style="width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ddd; border-radius: 3px; height: 60px; resize: none;"></textarea>
+                </div>
+
+                <div class="effect-options">
+                    <label>格子效果:</label>
+                    <label>
+                        <input type="radio" name="cellEffect" value="none" checked>
+                        无效果
+                    </label>
+                    <label>
+                        <input type="radio" name="cellEffect" value="forward">
+                        前进
+                        <input type="number" id="forwardSteps" min="1" max="10" value="1" class="steps-input">
+                        步
+                    </label>
+                    <label>
+                        <input type="radio" name="cellEffect" value="backward">
+                        后退
+                        <input type="number" id="backwardSteps" min="1" max="10" value="1" class="steps-input">
+                        步
+                    </label>
+                    <label>
+                        <input type="radio" name="cellEffect" value="skip">
+                        跳过一轮
+                    </label>
+                </div>
+                <button id="saveCellEffect">保存</button>
+                <button id="closeEditor">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
