@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>👥 四人回字 · 在线</title>
+<link rel="stylesheet" href="../game4/style.css"><style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Microsoft YaHei',sans-serif;background:linear-gradient(135deg,#1a1a2e,#16213e);min-height:100vh;color:#fff;display:flex;justify-content:center;padding:20px;}
+.container{max-width:1100px;width:100%;}
+h1{text-align:center;margin:20px 0;font-size:2.5em;text-shadow:0 0 20px rgba(255,215,0,0.3);}
+#lobby{background:rgba(255,255,255,0.08);border-radius:20px;padding:40px;max-width:500px;margin:0 auto;}
+.input-group{margin-bottom:15px;}
+.input-group label{display:block;margin-bottom:5px;font-size:0.9em;color:#aaa;}
+.input-group input,.input-group select{width:100%;padding:12px 15px;border:2px solid rgba(255,255,255,0.2);border-radius:10px;background:rgba(255,255,255,0.1);color:#fff;font-size:1em;outline:none;}
+.input-group input:focus{border-color:#ffd700;}
+.btn-row{display:flex;gap:15px;margin-top:20px;}
+.btn{padding:12px 30px;border:none;border-radius:10px;font-size:1.1em;font-weight:bold;cursor:pointer;transition:all 0.3s;flex:1;text-align:center;}
+.btn-primary{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;}
+.btn-primary:hover{transform:translateY(-2px);}
+.btn-success{background:linear-gradient(135deg,#4caf50,#2e7d32);color:#fff;}
+.btn-success:hover{transform:translateY(-2px);}
+.btn-warning{background:linear-gradient(135deg,#ff9800,#e65100);color:#fff;}
+#roomInfo{display:none;text-align:center;margin-top:20px;}
+.room-code{font-size:3em;font-weight:bold;color:#ffd700;letter-spacing:8px;margin:10px 0;}
+.player-list{list-style:none;margin:15px 0;}
+.player-list li{padding:10px;margin:5px 0;background:rgba(255,255,255,0.1);border-radius:8px;text-align:left;}
+#gameArea{display:none;flex-direction:column;align-items:center;width:100%;}
+.game-header{display:flex;justify-content:space-between;align-items:center;width:1040px;margin-bottom:10px;flex-wrap:wrap;gap:8px;}
+#playerPanel{display:flex;flex-wrap:wrap;gap:4px;}
+.turn-indicator{font-size:1.2em;font-weight:bold;color:#ffd700;}
+#gameBoard{width:1040px;height:1040px;position:relative;border-radius:10px;}
+.controls-bar{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;width:1040px;justify-content:center;}
+.controls-bar button,.controls-bar input{padding:8px 16px;border:none;border-radius:6px;cursor:pointer;font-size:0.85em;}
+.controls-bar label{color:#aaa;font-size:0.85em;display:flex;align-items:center;gap:5px;}
+#log{width:1040px;height:80px;overflow-y:auto;background:rgba(0,0,0,0.3);border-radius:8px;padding:8px;margin-top:8px;font-size:0.8em;color:#aaa;}
+/* 格子编辑弹窗 */
+#cellEditor{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#2a2a3a;padding:25px;border-radius:15px;z-index:100;min-width:320px;box-shadow:0 10px 40px rgba(0,0,0,0.5);}
+#cellEditor h3{margin-bottom:15px;color:#ffd700;}
+#cellEditor label{display:block;margin:8px 0 4px;color:#ccc;font-size:0.9em;}
+#cellEditor input[type="text"],#cellEditor textarea,#cellEditor input[type="number"]{width:100%;padding:8px;border:1px solid #444;border-radius:6px;background:#1a1a2e;color:#fff;font-size:0.9em;}
+#cellEditor textarea{height:50px;resize:none;}
+#cellEditor .radio-group label{display:inline-block;margin-right:15px;color:#ddd;}
+#cellEditor .btn-save{background:#4caf50;color:#fff;padding:8px 20px;border:none;border-radius:6px;cursor:pointer;margin-top:10px;font-weight:bold;}
+#cellEditor .btn-close{background:#666;color:#fff;padding:8px 20px;border:none;border-radius:6px;cursor:pointer;margin-top:10px;margin-left:10px;}
+#cellOverlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:99;}
+/* 弹窗 */
+#popupOverlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:200;justify-content:center;align-items:center;}
+#popupOverlay.show{display:flex;}
+.popup-content{background:rgba(255,255,255,0.95);padding:30px;border-radius:15px;max-width:400px;text-align:center;}
+.popup-content p{font-size:1.2em;color:#333;margin-bottom:15px;}
+.popup-content button{padding:8px 20px;border:none;border-radius:8px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;cursor:pointer;font-weight:bold;}
+/* 自定义棋子 */
+.custom-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:5px 0;}
+.custom-row select{padding:4px;border-radius:4px;border:1px solid #555;background:#1a1a2e;color:#fff;font-size:0.8em;}
+.custom-row label{color:#aaa;font-size:0.8em;}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>👥 四人回字 · 在线对战</h1>
+
+<div id="lobby">
+  <div class="input-group"><label>昵称</label><input type="text" id="pName" value="玩家"></div>
+  <div class="btn-row">
+    <button class="btn btn-primary" id="createBtn" onclick="createRoom()">🏠 创建房间</button>
+    <button class="btn btn-success" id="joinBtn" onclick="document.getElementById('joinCode').style.display='block'">🔑 加入</button>
+  </div>
+  <div id="joinCode" style="display:none;margin-top:10px">
+    <div class="input-group"><label>房间码</label><input type="text" id="jCode" placeholder="ABCD" onkeydown="if(event.key==='Enter')joinRoom()" style="text-transform:uppercase;letter-spacing:4px;font-size:1.2em;text-align:center;"></div>
+    <button class="btn btn-success" onclick="joinRoom()" style="width:100%;padding:10px;margin-top:5px;">✅ 加入</button>
+  </div>
+  <div id="roomInfo">
+    <p>房间码</p><div class="room-code" id="roomCode">----</div>
+    <ul class="player-list" id="playerList"></ul>
+    <button class="btn btn-warning" id="startBtn" onclick="startGame()" style="display:none">🎯 开始</button>
+  </div>
+</div>
+
+<div id="gameArea">
+  <div class="game-header">
+    <div class="turn-indicator" id="turnIndicator">等待开始...</div>
+    <div id="playerPanel"></div>
+  </div>
+  <div id="gameBoard"></div>
+  <div class="controls-bar">
+    <button class="btn btn-warning" id="restartBtn" style="padding:6px 14px;font-size:0.85em;">🔄 重开</button>
+    <button class="btn" id="clearBtn" onclick="clearAllData()" style="padding:6px 14px;font-size:0.85em;background:#666;">🗑️ 清除</button>
+    <label>🎨换棋:
+      <select id="pIcon1" style="padding:3px;font-size:0.8em;"><option value="👠">👠</option><option value="🚗">🚗</option><option value="🚀">🚀</option><option value="img1">🖼️</option></select>
+      <input type="file" id="pImg1" accept="image/*" style="display:none;width:60px;">
+    </label>
+    <label>🎨P2:
+      <select id="pIcon2" style="padding:3px;font-size:0.8em;"><option value="🚗">🚗</option><option value="👠">👠</option><option value="img2">🖼️</option></select>
+      <input type="file" id="pImg2" accept="image/*" style="display:none;width:60px;">
+    </label>
+    <label>🎨P3:
+      <select id="pIcon3" style="padding:3px;font-size:0.8em;"><option value="🐱">🐱</option><option value="🐶">🐶</option><option value="img3">🖼️</option></select>
+      <input type="file" id="pImg3" accept="image/*" style="display:none;width:60px;">
+    </label>
+    <label>🎨P4:
+      <select id="pIcon4" style="padding:3px;font-size:0.8em;"><option value="🎯">🎯</option><option value="⭐">⭐</option><option value="img4">🖼️</option></select>
+      <input type="file" id="pImg4" accept="image/*" style="display:none;width:60px;">
+    </label>
+    <label>🖼️背景:<input type="file" id="boardBg" accept="image/*" style="width:80px;font-size:0.8em;"></label>
+  </div>
+  <div id="log">📋 游戏日志</div>
+  <div style="margin-top:5px;color:#555;font-size:0.8em;text-align:center;">房间码: <span id="roomCodeDisplay"></span> | 点击格子可编辑文字+弹窗+效果</div>
+</div>
+
+<!-- 格子编辑器 -->
+<div id="cellOverlay"></div>
+<div id="cellEditor">
+  <h3>✏️ 格子设置</h3>
+  <label id="cellIndex">格子</label>
+  <label>格子文字</label><input type="text" id="celCustomText" maxlength="10" placeholder="显示在格子上">
+  <label>走到时弹窗</label><textarea id="celPopup" placeholder="弹窗文字"></textarea>
+  <label>格子效果</label>
+  <div class="radio-group">
+    <label><input type="radio" name="celEff" value="none" checked> 无</label>
+    <label><input type="radio" name="celEff" value="forward"> 前进 <input type="number" id="celFwd" style="width:50px;display:inline;" value="1">步</label>
+    <label><input type="radio" name="celEff" value="backward"> 后退 <input type="number" id="celBwd" style="width:50px;display:inline;" value="1">步</label>
+    <label><input type="radio" name="celEff" value="skip"> 停一轮</label>
+  </div>
+  <button class="btn-save" id="saveCell">💾 保存</button>
+  <button class="btn-close" id="closeEditor">✕ 关闭</button>
+</div>
+
+<!-- 弹窗 -->
+<div id="popupOverlay">
+  <div class="popup-content">
+    <p id="popupText"></p>
+    <button id="closePopup">知道了</button>
+  </div>
+</div>
+</div>
+<script src="/socket.io/socket.io.js"></script>
+<script src="game.js"></script>
+</body>
+</html>
